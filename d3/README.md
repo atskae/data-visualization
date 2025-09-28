@@ -1,0 +1,158 @@
+# D3
+
+Keeping track of learning D3 here.
+
+Using [Interactive Data Visualization for the Web](https://scottmurray.org/work/d3-book-2e) by Scott Murray to start!
+
+# How to Run
+```
+cd src
+python -m http.server 8888
+```
+
+Then go to `http://localhost:8888`
+
+# Interactive Data Visualization for the Web
+
+## Chapter 2: Introducing D3
+
+p7
+* Primary author of D3 is [Mike Bostock](https://bost.ocks.org/mike/)
+* Entirely open-source on [GitHub](https://github.com/d3) with other dedicated contributors
+* [D3 homepage](https://d3js.org/)
+
+### What it Doesn't Do
+
+p9
+* D3 does not hide your original data
+  * D3 is run on client-side, so the data to be visualized is sent to the client's computer
+  * Can extract data off a graph using [DataThief](https://datathief.org/)
+* Don't use D3 if the the data cannot be shared - then what is the point?
+
+### Origins and Context
+p10
+* [Technical design and philosophy behind D3 (InfoVis paper)](http://vis.stanford.edu/files/2011-D3-InfoVis.pdf)
+
+### Alternatives
+p10
+* D3 cannot be used on *really* old browsers
+* If you need something simple quick and no time to code it up
+* Alternatives for: simple charts, connected graphs, geomapping (geographic data)
+    * See book for example libraries
+
+p12
+* Other tools for drawing free-form vector graphics
+    * [paper.js](http://paperjs.org/) - see their examples!
+    * [p5.js](https://get-lauren.net/p5-js) (led by Lauren McCarthy)
+    * ... and more (see book)
+
+p13
+* Rendering 3D: three.js
+* Libraries built on top of D3
+
+p14
+* More specialized tools that uses or used with D3
+    * [Crossfilter](https://github.com/crossfilter/crossfilter) for working with large, multivariate datasets
+    * ... a bunch more
+
+## Chapter 3: Technology Fundamentals
+
+* A nice explanation of how the web/browsers work
+* Browser developer tools (Chrome: (three dots menu on top-right) -> More Tools -> Developer Tools)
+* HTML/CSS/Javascript review
+
+## Chapter 4: Setup
+
+### Downloading D3
+Using the updated [D3 docs](https://d3js.org/getting-started#d3-in-vanilla-html) instead.
+
+JavaScript terminology:
+* ES Module (ECMA module) - official standard format of Javscript modules (to be able to share/import JavaScript)
+* UMD (Universal Module Definition) is another JS module format before a standard existed
+  
+## Chapter 5: Data
+
+### Generating Page Elements
+
+p72
+* [D3 API reference](https://d3js.org/api) to know args/return types
+
+### Binding Data
+p78
+* `d3.csv()`, `d3.json()`
+    * When reading in CSV, all values are stored as a string (ex. integers and floats are stored as a string)
+* [Mr. Data Converter](https://shancarter.github.io/mr-data-converter/): convert CSV to JSON/other formats
+ 
+ #### Please Make Your Selection
+* `enter()` method:
+```js
+var dataset = [5, 10, 15, 20, 25];
+
+d3.select("body").selectAll("p")
+    .data(dataset)
+    .enter()
+    .append("p")
+    .text("A new paragraph! すげーー");
+```
+
+A breakdown of the code above:
+* `.selectAll("p")`: Gets a reference to all `"p"` elements in the HTML DOM, even those that *do not exist yet*
+* `.data(dataset)`: Counts and parses the data values
+  * Method calls after this call will occur `len(dataset)` times
+* `.enter()`: This looks at the current DOM and the dataset, and creates new *placeholder elements* in the DOM if there are more data items than DOM elements (from the `.selectAll("p")`), and returns a reference to the *new* DOM elements (not existing ones)
+
+I had to add this to `index.html` for the Developer Tools console to use D3:
+```html
+<head>
+    <meta charset="utf-8">
+    <!--Access D3 in the console-->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+```
+
+If we then run `d3.selectAll("p")` in the JS console after reloading `index.html`, we can see that each `p` element now has a `__data__` field with a data element from `dataset` binded to the `p` element:
+```
+> d3.selectAll("p")
+Vn {_groups: Array(1), _parents: Array(1)}
+    _groups: Array(1)
+        0: NodeList(5)
+            0: p
+                __data__: 5
+                ...
+```
+
+This data does not exist in the DOM, but exists in memory as `__data__`.
+
+#### Using Your Data
+Replace the last line in the code snippet above to add a callback function:
+```js
+elect("body").selectAll("p")
+.data(dataset)
+.enter()
+.append("p")
+.text(function(data) {
+    var s = "The number " + data + ", すげーー";
+    return s;
+});
+```
+
+<img src="images/binding-data-5-elements.png" width="400">
+
+Whenever we call `data()`, we can create an anonymous function that accepts the data element as an argument.
+
+#### Beyond Text
+We can modify HTMl/CSS properties with `attr()` and `style()`.
+
+```js
+.style("color", function(data) {
+    if (data > 15) {
+        return "red";
+    } else {
+        return "black";
+    }
+});
+```
+
+<img src="images/change-color-based-on-threshold.png" width="400">
+
+## Chapter 6: Drawing with Data

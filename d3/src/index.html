@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <!--TODO: Need to access D3 in the console?-->
+        <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    </head>
+    
+    <body>
+        <div id="container">
+            <h1>Learning D3</h1>
+        </div>
+
+        <script type="module">
+            import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+            console.log("Imported D3");
+
+//            d3.select("body")
+//                .append("p")
+//                .text("A new paragraph!");
+//
+            var dataset = [5, 10, 15, 20, 25];
+            d3.select("body").selectAll("p")
+                .data(dataset)
+                .enter()
+                .append("p")
+                .text(function(data) {
+                    var s = "The number " + data + ", すげーー";
+                    return s;
+                })
+                .style("color", function(data) {
+                    if (data > 15) {
+                        return "red";
+                    } else {
+                        return "black";
+                    }
+                });
+        </script>
+    </body>
+    
+</html>
