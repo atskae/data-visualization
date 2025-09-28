@@ -3,6 +3,7 @@
 Keeping track of learning D3 here.
 
 Using [Interactive Data Visualization for the Web](https://scottmurray.org/work/d3-book-2e) by Scott Murray to start!
+* Note that I am using D3 v7 while the book refers to v4
 
 # How to Run
 ```
@@ -136,7 +137,7 @@ elect("body").selectAll("p")
 });
 ```
 
-<img src="images/binding-data-5-elements.png" width="400">
+<img src="images/binding-data-5-elements.png" width="150">
 
 Whenever we call `data()`, we can create an anonymous function that accepts the data element as an argument.
 
@@ -153,6 +154,125 @@ We can modify HTMl/CSS properties with `attr()` and `style()`.
 });
 ```
 
-<img src="images/change-color-based-on-threshold.png" width="400">
+<img src="images/change-color-based-on-threshold.png" width="150">
 
 ## Chapter 6: Drawing with Data
+p91
+* Create a style for the class `"bar"` in a separate file `style.css`
+
+```css
+div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;
+    background-color: teal
+}
+```
+* Move CSS to a separate file and import it in `index.html`:
+```html
+<link rel="stylesheet" href="style.css">
+```
+* Then create a `div` with class `"bar'`:
+```html
+<div class="bar"></div> 
+```
+
+
+* `.classed("bar", true)`: Can apply a style of a class called "bar" to an element (use `false` to remove the style)
+
+#### Back to the Bars
+We can apply the `"bar"` style class to our data elements:
+```js
+var dataset = [5, 10, 15, 20, 25];
+d3.select("body").selectAll("p")
+    .data(dataset)
+    .enter()
+    .append("div")
+    .attr("class", "bar");
+```
+
+<img src="images/apply-class-bar-to-dataset.png" width="100">
+
+Modify the height of the `div` based on the data element:
+```js
+.attr("class", "bar")
+.style("height", function(d) {
+    return d + "px";
+});
+```
+
+<img src="images/bar-height-based-on-data-element.png" width="150">
+
+Scale the height and add some margin between bars:
+```js
+.style("height", function(d) {
+    var barHeight = d*5; // scale the height for visibility
+    return barHeight + "px";
+});
+```
+```css
+div.bar {    
+    /* ... */
+    margin: 2px;
+}
+```
+
+Yay, a decent-looking bar chart!
+
+<img src="images/bar-scaled-margin-2px.png" width="150">
+
+We can inspect the final HTML that is generated:
+
+<img src="images/inspect-bars-console.png" width="500">
+
+### The Power of `data()`
+p93
+
+The `data()` call automatically goes through all the data.
+
+Adding more data items and rules:
+```js
+var dataset = [
+    4, 99, 21, 2, 34, 70, 62, 3, 55, 8
+];
+d3.select("body").selectAll("p")
+    .data(dataset)
+    .enter()
+    .append("div")
+    .attr("class", "bar")
+    .style("height", function(d) {
+        var barHeight = d*5; // scale the height for visibility
+        return barHeight + "px";
+    })
+    .style("background-color", function(d) {
+        if (d > 50) {
+            return "#cc5555"; // a nicer red
+        } else {
+            return "teal";
+        }
+    });
+```
+
+<img src="images/more-bars-and-rules.png" width="200">
+
+"*The data is driving the visualization - not the other way around.*"
+
+#### Random Data
+
+Generate random data values and graph them:
+
+```js
+var dataset = []
+for (var i=0; i<25; i++) {
+    // Generate a random number between 0 and 100
+    var d = Math.random() * 100;
+    dataset.push(d);
+}
+```
+
+<img src="images/bars-random-data-0.png" width="200">
+<img src="images/bars-random-data-1.png" width="200">
+<img src="images/bars-random-data-2.png" width="200">
+<img src="images/bars-random-data-3.png" width="200">
+
+### Drawing SVGs
