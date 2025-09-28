@@ -127,14 +127,14 @@ This data does not exist in the DOM, but exists in memory as `__data__`.
 #### Using Your Data
 Replace the last line in the code snippet above to add a callback function:
 ```js
-elect("body").selectAll("p")
-.data(dataset)
-.enter()
-.append("p")
-.text(function(data) {
-    var s = "The number " + data + ", すげーー";
-    return s;
-});
+select("body").selectAll("p")
+    .data(dataset)
+    .enter()
+    .append("p")
+    .text(function(data) {
+        var s = "The number " + data + ", すげーー";
+        return s;
+    });
 ```
 
 <img src="images/binding-data-5-elements.png" width="150">
@@ -270,9 +270,9 @@ for (var i=0; i<25; i++) {
 }
 ```
 
-<img src="images/bars-random-data-0.png" width="200">
-<img src="images/bars-random-data-1.png" width="200">
-<img src="images/bars-random-data-2.png" width="200">
-<img src="images/bars-random-data-3.png" width="200">
+<img style="display: inline;" src="images/bars-random-data-0.png" width="200">
+<img style="display: inline;" src="images/bars-random-data-1.png" width="200">
+<img style="display: inline;" src="images/bars-random-data-2.png" width="200">
+<img style="display: inline;" src="images/bars-random-data-3.png" width="200">
 
 ### Drawing SVGs
