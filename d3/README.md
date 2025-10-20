@@ -276,3 +276,83 @@ for (var i=0; i<25; i++) {
 <img style="display: inline;" src="images/bars-random-data-3.png" width="200">
 
 ### Drawing SVGs
+
+* SVG format (in the DOM) look like HTML syntax
+* D3 `append()` and `attr()` can also be applied to SVGs
+
+#### Create the SVG
+
+Can create an empty SVG element in the DOM:
+
+```js
+var svg = d3.select("body").append("svg");
+```
+
+With Developer Tools we can see that the element was created:
+
+<img src="images/create-svg-element.png" width=150/>
+
+We can reference the SVG element and apply attributes directly:
+```js
+var width = 500;
+var height = 50;
+var svg = d3.select("body")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+```
+
+<img src="images/create-svg-element-attributes.png" width=250/>
+
+
+#### Data Driven Shapes
+
+```js
+var dataset = [5, 10, 15, 20, 25];
+
+// Create circle elements inside the SVG element
+svg.selectAll("circle") // returns a reference to empty Circle elements
+    .data(dataset) // Binds each data item in `dataset` to each Circle element
+    .enter() // Return a reference to the new element
+    .append("circle"); // Add circle to the DOM
+```
+
+Add styles based on the data value binded to each circle element
+```js
+circles.attr("cx", function(d, i) { // d=data element, i=index
+        return (i*50) + 25;
+    })
+```
+
+D3 provides the bounded data `d` and the index `i` within the dataset (`d` and `i` are arbitrary variable names).
+
+[Documentation on all SVG attributes](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute). Played around with some:
+
+```js
+circles.attr("cx", function(d, i) {
+        return (i*50) + 25;
+    })
+    .attr("cy", height/2)
+    .attr("r", function(d) {
+        return d;
+    })
+    .attr("fill", function(d) {
+        if (d%10 == 0) {
+            return "#db7fef";
+        } else {
+            return "#91ebf7";
+        }
+    });
+```
+
+Circle attributes [(full docs)](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/circle)
+* `cx`: x-coordinate of the center of the circle in the SVG element
+* `cy`: y-coordinate of the center of the circle in the SVG element
+* `r`: radius
+* `fill`: color of the circle
+
+🫧
+
+<img src="images/filled-circles.png" width=200/>
+
+### Making a Bar Chart

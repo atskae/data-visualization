@@ -41,6 +41,39 @@
                         return "teal";
                     }
                 });
+            
+            // Create an SVG element inside the DOM body element
+            var width = 500;
+            var height = 50;
+            var svg = d3.select("body")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            var dataset = [5, 10, 15, 20, 25];
+            // Create circle elements inside the SVG element
+            var circles = svg.selectAll("circle") // returns a reference to empty Circle elements
+                .data(dataset) // Binds each data item in `dataset` to each Circle element
+                .enter() // Return a reference to the new element
+                .append("circle"); // Add circle to the DOM
+
+            // Apply styles to each Circle, depending on the binded data item
+            circles.attr("cx", function(d, i) { // d=data element, i=index
+                    return (i*50) + 25;
+                })
+                .attr("cy", height/2)
+                .attr("r", function(d) {
+                    return d;
+                })
+                .attr("fill", function(d) {
+                    if (d%10 == 0) {
+                        return "#db7fef";
+                    } else {
+                        return "#91ebf7";
+                    }
+                })
+                .attr("stroke", "#d3f9ff")
+                .attr("stroke-width", 5);
         </script>
     </body>
     
