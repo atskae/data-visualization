@@ -356,3 +356,97 @@ Circle attributes [(full docs)](https://developer.mozilla.org/en-US/docs/Web/SVG
 <img src="images/filled-circles.png" width=200/>
 
 ### Making a Bar Chart
+
+Create rectangles inside of an SVG object in the DOM:
+
+```js
+// Create an SVG element inside the DOM body element
+var width = 500;
+var height = 100;
+var svg = d3.select("body")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("style", "outline: thin solid #dedede");
+
+// Select all the *future* rectangles that will be created
+svg.selectAll("rect")
+    .data(dataset)  // dataset is passed onto enter()
+    .enter()        // which creates an empty reference to each data value
+    .append("rect") // Creates a rectangle for each data value
+    .attr("x", function(data, index) {
+        return index * (width / dataset.length);
+    })   // Apply the following attributes to each rectangle
+    .attr("y", 0)
+    .attr("width", 20)
+    .attr("height", 100);
+```
+
+<img src="images/svg-bars.png" width="400">
+
+If we adjust the bar height with the data value:
+```js
+.attr("height", function(data, index) {
+    return data;
+});
+```
+
+the bars are upside down:
+
+<img src="images/svg-bar-heights.png" width="400">
+
+This is because the SVG coordinate system has `(x=0, y=0)` at the top-left corner of the SVG object:
+
+<img src="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Positions/canvas_default_grid.png">
+
+We want the base of the rectangle to be at the bottom of the SVG object minus the height of the bar (which is just `data`), so that it fits in the SVG object:
+```js
+.attr("y", function(data, index) {
+    return svgHeight - data;
+})
+```
+
+<img src="images/svg-bar-heights-adjusted.png" width="400">
+
+#### Color
+
+Adjust the color based on bar height:
+```js
+.attr("fill", function(data, index) {
+    return "rgb(" + Math.round(data*10) + ", 0, 0)";
+});
+```
+
+<img src="images/svg-bar-height-colors.png" width="400">
+
+#### Labels
+
+We create a `text` element in the SVG object for each dataset, and apply attributes:
+
+```js
+// Selects all *future* text that will be created
+svg.selectAll("text")
+    .data(dataset) // the dataset to be passed into enter()
+    .enter()
+    .append("text") // Creates an empty reference to a text object for this data value
+    .text(function(data, index) { // Not set via attr()
+        return data;
+    })
+    .attr("x", function(data, index) {
+        // Set the label to be positioned in the middle of the bar
+        let barWidth = (svgWidth / dataset.length) - barPadding;
+        return index * (svgWidth / dataset.length) + (barWidth / 2); // padding
+    })
+    .attr("y", function(data, index) {
+        return svgHeight - (data*4) + 20; // +20 padding
+    })
+    .attr("fill", "white")
+    .attr("font-size", "12px")
+    .attr("font-family", "sans-serif")
+    .attr("text-anchor", "middle"); // set label to be in the middle
+```
+
+<img src="images/bars-with-labels.png" width="400">
+
+
+### Making a Scatterplot

@@ -16,64 +16,108 @@
             import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
             console.log("Imported D3");
             
-            //var dataset = [
-            //    4, 99, 21, 2, 34, 70, 62, 3, 55, 8
-            //];
-            var dataset = []
-            for (var i=0; i<25; i++) {
-                // Generate a random number between 0 and 100
-                var d = Math.random() * 100;
-                dataset.push(d);
-            }
-            d3.select("body").selectAll("p")
-                .data(dataset)
-                .enter()
-                .append("div")
-                .attr("class", "bar")
-                .style("height", function(d) {
-                    var barHeight = d*5; // scale the height for visibility
-                    return barHeight + "px";
-                })
-                .style("background-color", function(d) {
-                    if (d > 50) {
-                        return "#cc5555"; // a nicer red
-                    } else {
-                        return "teal";
-                    }
-                });
+            var dataset = [
+                20, 13, 22, 21, 44, 15, 39, 9, 25, 18
+            ];
+            //var dataset = []
+            //for (var i=0; i<25; i++) {
+            //    // Generate a random number between 0 and 100
+            //    var d = Math.random() * 100;
+            //    dataset.push(d);
+            //}
+            //d3.select("body").selectAll("p")
+            //    .data(dataset)
+            //    .enter()
+            //    .append("div")
+            //    .attr("class", "bar")
+            //    .style("height", function(d) {
+            //        var barHeight = d*5; // scale the height for visibility
+            //        return barHeight + "px";
+            //    })
+            //    .style("background-color", function(d) {
+            //        if (d > 50) {
+            //            return "#cc5555"; // a nicer red
+            //        } else {
+            //            return "teal";
+            //        }
+            //    });
             
             // Create an SVG element inside the DOM body element
-            var width = 500;
-            var height = 50;
+            var svgWidth = 500;
+            var svgHeight = 300;
+            var barPadding = 1;
             var svg = d3.select("body")
                 .append("svg")
-                .attr("width", width)
-                .attr("height", height);
+                .attr("width", svgWidth)
+                .attr("height", svgHeight)
+                .attr("style", "outline: thin solid #dedede");
 
-            var dataset = [5, 10, 15, 20, 25];
-            // Create circle elements inside the SVG element
-            var circles = svg.selectAll("circle") // returns a reference to empty Circle elements
-                .data(dataset) // Binds each data item in `dataset` to each Circle element
-                .enter() // Return a reference to the new element
-                .append("circle"); // Add circle to the DOM
+            // Select all the *future* rectangles that will be created
+            svg.selectAll("rect")
+                .data(dataset)  // dataset is passed onto enter()
+                .enter()        // which creates an empty reference to each data value
+                .append("rect") // Creates a rectangle for each data value
+                .attr("x", function(data, index) {
+                    return index * (svgWidth / dataset.length);
+                })   // Apply the following attributes to each rectangle
+                .attr("y", function(data, index) {
+                    return svgHeight - (data*4);
+                })
+                .attr("width", function(data, index) {
+                    return (svgWidth / dataset.length) - barPadding;
+                })
+                .attr("height", function(data, index) {
+                    return data*4;
+                })
+                .attr("fill", function(data, index) {
+                    return "rgb(" + Math.round(data*10) + ", 0, 0)";
+                });
 
-            // Apply styles to each Circle, depending on the binded data item
-            circles.attr("cx", function(d, i) { // d=data element, i=index
-                    return (i*50) + 25;
+            // Selects all *future* text that will be created
+            svg.selectAll("text")
+                .data(dataset) // the dataset to be passed into enter()
+                .enter()
+                .append("text") // Creates an empty reference to a text object for this data value
+                .text(function(data, index) { // Not set via attr()
+                    return data;
                 })
-                .attr("cy", height/2)
-                .attr("r", function(d) {
-                    return d;
+                .attr("x", function(data, index) {
+                    // Set the label to be positioned in the middle of the bar
+                    let barWidth = (svgWidth / dataset.length) - barPadding;
+                    return index * (svgWidth / dataset.length) + (barWidth / 2); // padding
                 })
-                .attr("fill", function(d) {
-                    if (d%10 == 0) {
-                        return "#db7fef";
-                    } else {
-                        return "#91ebf7";
-                    }
+                .attr("y", function(data, index) {
+                    return svgHeight - (data*4) + 20; // +20 padding
                 })
-                .attr("stroke", "#d3f9ff")
-                .attr("stroke-width", 5);
+                .attr("fill", "white")
+                .attr("font-size", "12px")
+                .attr("font-family", "sans-serif")
+                .attr("text-anchor", "middle"); // set label to be in the middle
+
+            //var dataset = [5, 10, 15, 20, 25];
+            //// Create circle elements inside the SVG element
+            //var circles = svg.selectAll("circle") // returns a reference to empty Circle elements
+            //    .data(dataset) // Binds each data item in `dataset` to each Circle element
+            //    .enter() // Return a reference to the new element
+            //    .append("circle"); // Add circle to the DOM
+
+            //// Apply styles to each Circle, depending on the binded data item
+            //circles.attr("cx", function(d, i) { // d=data element, i=index
+            //        return (i*50) + 25;
+            //    })
+            //    .attr("cy", height/2)
+            //    .attr("r", function(d) {
+            //        return d;
+            //    })
+            //    .attr("fill", function(d) {
+            //        if (d%10 == 0) {
+            //            return "#db7fef";
+            //        } else {
+            //            return "#91ebf7";
+            //        }
+            //    })
+            //    .attr("stroke", "#d3f9ff")
+            //    .attr("stroke-width", 5);
         </script>
     </body>
     
