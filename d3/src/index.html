@@ -43,8 +43,8 @@
             //    });
             
             // Create an SVG element inside the DOM body element
-            var svgWidth = 500;
-            var svgHeight = 300;
+            var svgWidth = 800;
+            var svgHeight = 500;
             var barPadding = 1;
             var svg = d3.select("body")
                 .append("svg")
@@ -126,7 +126,8 @@
                 [121, 55],
                 [311, 211],
                 [145, 131],
-                [212, 17]
+                [212, 17],
+                [800, 400]
             ];
             // Create the SVG element in the DOM
             var svg = d3.select("body")
@@ -135,16 +136,28 @@
                 .attr("height", svgHeight)
                 .attr("style", "outline: thin solid #dedede");
             
+            // Create scales that will ensure that the points always fit in the SVG object
+            // We fit the dataset values to the width and height of the SVG
+            var padding = 50;
+            var xScale = d3.scaleLinear()
+                // Across the dataset, compare each value's first element with each other
+                .domain([0, d3.max(dataset, function(data) { return data[0]; })])
+                // Map the dataset x-values to the bounds of the SVG's width
+                .range([padding, svgWidth - padding]);
+            var yScale = d3.scaleLinear()
+                .domain([0, d3.max(dataset, function(data) { return data[1]})])
+                .range([svgHeight - padding, padding]);
+
             // For each datapoint, we create a circle
             svg.selectAll("circle") // Get a reference to all *future* circles that will be created
                 .data(dataset)      // Get the dataset to be applied to each circle
                 .enter()            // Pass in `dataset` to enter()
                 .append("circle")   // Create the actual circle
                 .attr("cx", function(data, index) {
-                    return data[0];
+                    return xScale(data[0]);
                 })
                 .attr("cy", function(data, index) {
-                    return data[1];
+                    return yScale(data[1]);
                 })
                 .attr("fill", "black")
                 .attr("r", function(data, index) {
@@ -160,10 +173,10 @@
                     return "(" + data[0] + ", " + data[1] + ")";
                 })
                 .attr("x", function(data, index) {
-                    return data[0];
+                    return xScale(data[0]);
                 })
                 .attr("y", function(data, index) {
-                    return data[1] + 21; // padding
+                    return yScale(data[1]) + 20; // padding 
                 })
                 .attr("text-anchor", "middle");
 

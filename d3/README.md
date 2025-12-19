@@ -536,3 +536,118 @@ svg.selectAll("text")
 ```
 
 <img src="images/scatterplot-with-labels.png" width="400">
+
+
+## Chapter 7: Scales
+
+*"Scales are functions that map from an input domain to an output range."*
+
+* Scales are a mathematical relationship between data
+* **Axes** are a visual representation of scales
+* Many types of scales: linear, ordinal, logarithmic, square root, etc...
+* Use scales instead of hard-coded pixel values when displaying points
+
+### Domain and Ranges
+
+Given a hypothetical dataset `[1, 2, 3, 4, 5]`:
+* **Input domain**: are the range of possible data values (in the example dataset, this would be 1-5)
+* **Output range**: is the posslble *display values* that the data gets mapped to onto the screen
+  * This is determined by the visalization designer
+  * Example: the smallest value `1` gets mapped to pixel value `10px` and the largest value `5` gets mapped to pixel value `100px`.
+
+### Normalization
+
+With a linear scale, the above is performing *normalization*, mapping a numeric value to a value between 0 and 1.
+
+### Creating a Scale
+
+We can access D3's scale function with (on the console, for example):
+```js
+> var scale = d3.scaleLinear(); // in Javascript, functions can also be variables
+> scale(2.5);
+2.5
+```
+
+We need to set the domain and range of the scale:
+```js
+> scale.domain([100, 500]);
+> scale.range([10, 350]);
+```
+
+Now input values are appropriately scaled:
+```js
+> scale(100)
+10
+> scale(200)
+95
+> scale(500)
+350
+```
+
+We can use D3's scale function in our `attr()` when plotting points.
+
+### Scaling the Scatterplot
+
+We can also use `d3.min()` and `d3.max()`
+
+```js
+// Create scalesi that will ensure that the points always fit in the SVG object
+// We fit the dataset values to the width and height of the SVG
+var xScale = d3.scaleLinear()
+    // Across the dataset, compare each value's first element with each other
+    .domain([0, d3.max(dataset, function(data) { return data[0]; })])
+    // Map the dataset x-values to the bounds of the SVG's width
+    .range([0, svgWidth]);
+var yScale = d3.scaleLinear()
+    .domain([0, d3.max(dataset, function(data) { return data[1]})])
+    .range([0, svgHeight]);
+```
+
+and apply the scales to the x and y values of the circles and the labels:
+```js
+.attr("cx", function(data, index) {
+    return xScale(data[0]);
+})
+.attr("cy", function(data, index) {
+    return yScale(data[1]);
+})
+```
+
+```js
+.attr("x", function(data, index) {
+    return xScale(data[0]);
+})
+.attr("y", function(data, index) {
+    return yScale(data[1]) + 20; // padding 
+})
+```
+
+<img src="images/scatterplot-with-scaling.png" width="400">
+
+We can change `yScale` to flip y-values so that larger y-values are at the top:
+```js
+.range([svgHeight, 0]);
+```
+
+<img src="images/scatterplot-with-scaling-y-values.png" width="400">
+
+Add some padding in the scales so that the points completely fit in the SVG:
+```js
+var padding = 20;
+var xScale = d3.scaleLinear()
+    // Across the dataset, compare each value's first element with each other
+    .domain([0, d3.max(dataset, function(data) { return data[0]; })])
+    // Map the dataset x-values to the bounds of the SVG's width
+    .range([padding, svgWidth - padding]);
+var yScale = d3.scaleLinear()
+    .domain([0, d3.max(dataset, function(data) { return data[1]})])
+    .range([svgHeight - padding, padding]);
+```
+
+<img src="images/scatterplot-with-padding.png" width="400">
+
+If we change the size of the SVG or add a new data point `[800, 400]` in the far corner, the image adjusts/scales automatically:
+
+<img src="images/scatterplot-large-point.png" width="500">
+
+### Other Methods
