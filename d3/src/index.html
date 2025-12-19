@@ -148,7 +148,11 @@
                 .domain([0, d3.max(dataset, function(data) { return data[1]})])
                 .range([svgHeight - padding, padding]);
 
-            // For each datapoint, we create a circle
+            var aScale = d3.scaleSqrt()
+                .domain([0, d3.max(dataset, function(data) { return data[1]; })])
+                .range([0, 10]); // Range is arbitrary - what matters is that the circle areas are relative
+            
+                // For each datapoint, we create a circle
             svg.selectAll("circle") // Get a reference to all *future* circles that will be created
                 .data(dataset)      // Get the dataset to be applied to each circle
                 .enter()            // Pass in `dataset` to enter()
@@ -161,7 +165,7 @@
                 })
                 .attr("fill", "black")
                 .attr("r", function(data, index) {
-                    return Math.sqrt(data[1] / Math.PI);
+                    return aScale(data[1]);
                 });
 
             // Labels for each point in the scatterplot
@@ -180,6 +184,17 @@
                 })
                 .attr("text-anchor", "middle");
 
+            var timeParser = d3.timeParse("%m/%d/%y");
+            var csvRowConverter = function(row) {
+                return {
+                    date: timeParser(row.Date),
+                    amount: parseInt(row.Amount)
+                };
+            };
+            d3.csv("data/time_scale_data.csv", csvRowConverter)
+                .then(function(parsedData) {
+                    console.log(parsedData);
+                });
         </script>
     </body>
     

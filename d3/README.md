@@ -651,3 +651,83 @@ If we change the size of the SVG or add a new data point `[800, 400]` in the far
 <img src="images/scatterplot-large-point.png" width="500">
 
 ### Other Methods
+
+There's a bunch of other D3 scales, such as `scaleSqrt`, `scalePow`. See [the docs](https://d3js.org/d3-scale) for a full list.
+
+We can use `scaleSqrt` to adjust the circle's area more easily:
+
+```js
+var aScale = d3.scaleSqrt()
+    .domain([0, d3.max(dataset, function(data) { return data[1]; })])
+    .range([0, 10]); // Range is arbitrary - what matters is that the circle areas are relative
+```
+
+```js
+.attr("r", function(data, index) {
+    return aScale(data[1]);
+});
+```
+
+<img src="images/scatterplot-scaleSqrt.png" width="400">
+
+
+### Time Scales
+
+[Javascript `Date` object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) represents a moment in time in Javascript.
+
+On the console:
+```js
+> new Date
+Date Fri Dec 19 2025 09:23:13 GMT-0500 (Eastern Standard Time)
+```
+
+Cool tangents to read about on the concept of time:
+* [UTC: The World's Time Standard](https://www.timeanddate.com/time/aboututc.html)
+* [moment.js](https://momentjs.com/)
+* [Data Stores podcast - Rocket Science with Rachel Binx](https://datastori.es/70-rocket-science-with-rachel-binx/)
+
+Javascript and D3 can only work with time with `Date` objects.
+
+#### Converting strings to dates
+
+D3 provides functions to parse strings of varying formats into `Date` objects, see the documentation on [d3-time-formats](https://d3js.org/d3-time-format).
+* [timeParse](https://d3js.org/d3-time-format#timeParse)
+* [timeFormatLocale](https://d3js.org/d3-time-format#timeFormatLocale)
+
+```js
+> var parseTime = d3.timeParse("%m/%d/%y")
+> parseTime("12/19/25")
+Date Fri Dec 19 2025 00:00:00 GMT-0500 (Eastern Standard Time)
+```
+
+We can read in a CSV file of dates `time_scale_data.csv`:
+```csv
+Date,Amount
+12/19/25,10
+12/20/25,20
+12/21/25,31
+12/22/25,32
+12/23/25,33
+12/24/25,40
+12/25/25,55
+```
+
+and parse the contents to Javascript objects with converted `Date` objects and integers (recall CSV values are strings, even integers):
+```js
+var timeParser = d3.timeParse("%m/%d/%y");
+var csvRowConverter = function(row) {
+    return {
+        date: timeParser(row.Date),
+        amount: parseInt(row.Amount)
+    };
+};
+// Need to reference data in the `then()` callback, as d3.csv() is async
+d3.csv("data/time_scale_data.csv", csvRowConverter)
+    .then(function(parsedData) {
+        console.log(parsedData);
+    });
+```
+
+The `then()` call is different from an older version of d3 - the [csv API](https://d3js.org/d3-fetch#csv) seems to have changed.
+
+<img src="images/time_scale_data_as_objects.png" width="400">
