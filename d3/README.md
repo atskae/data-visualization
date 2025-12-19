@@ -450,3 +450,89 @@ svg.selectAll("text")
 
 
 ### Making a Scatterplot
+
+We now use 2-dimensional data:
+
+```js
+// Scatterplot dataset
+var dataset = [
+    [134, 223],
+    [208, 117],
+    [121, 55],
+    [311, 211],
+    [145, 131],
+    [212, 17]
+];
+// Create the SVG element in the DOM
+var svg = d3.select("body")
+    .append("svg")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight)
+    .attr("style", "outline: thin solid #dedede");
+
+// For each datapoint, we create a circle
+svg.selectAll("circle") // Get a reference to all *future* circles that will be created
+    .data(dataset)      // Get the dataset to be applied to each circle
+    .enter()            // Pass in `dataset` to enter()
+    .append("circle")   // Create the actual circle
+    .attr("cx", function(data, index) {
+        return data[0];
+    })
+    .attr("cy", function(data, index) {
+        return data[1];
+    })
+    .attr("fill", "black")
+    .attr("r", 3);
+```
+
+Just some dots... 😆
+
+<img src="images/boring-scatterplot.png" width="400">
+
+If we want to use the circle's size to represent the data that the circle is bounded to, use the circle's *area*, not radius.
+This is because human perception associates a circle's area to its "value" - using the circle's radius would lose that relativity between circles and overexaggerate the difference between data points (as circles).
+
+Area `A` of a circle:
+```
+A = πr^2
+```
+
+What do we need to set the radius `r` to in our visualization?
+
+```
+A/π = r^2
+sqrt(A/π) = r
+```
+
+We use the data value of the circle to "correlate" with the area `A` in the equation.
+
+Here we arbitrarily make circles larger if the data have a greater `y` value:
+```js
+.attr("r", function(data, index) {
+    return Math.sqrt(data[1] / Math.PI);
+});
+```
+
+<img src="images/vary-size-scatterplot.png" width="400">
+
+#### Labels
+
+```js
+// Labels for each point in the scatterplot
+svg.selectAll("text")
+    .data(dataset)
+    .enter()
+    .append("text")
+    .text(function(data, index) {
+        return "(" + data[0] + ", " + data[1] + ")";
+    })
+    .attr("x", function(data, index) {
+        return data[0];
+    })
+    .attr("y", function(data, index) {
+        return data[1] + 21; // padding
+    })
+    .attr("text-anchor", "middle");
+```
+
+<img src="images/scatterplot-with-labels.png" width="400">
