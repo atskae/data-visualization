@@ -728,6 +728,60 @@ d3.csv("data/time_scale_data.csv", csvRowConverter)
     });
 ```
 
-The `then()` call is different from an older version of d3 - the [csv API](https://d3js.org/d3-fetch#csv) seems to have changed.
+The `then()` call is related to async/await in Javascript. `then()` is the logic to run after the `d3.csv()` finished.
 
-<img src="images/time_scale_data_as_objects.png" width="400">
+```js
+var dataset = await d3.csv("data/time_scale_data.csv", csvRowConverter)
+    .then(function(parsedData) {
+        console.log(parsedData);
+        return parsedData;
+    });
+```
+
+<img src="images/time_scale_data_as_objects.png" width="700">
+
+#### Scaling time
+
+We use `d3.timeScale` to create a scale that maps `Date` objects to pixel values in our SVG scatterplot:
+```js
+var xScale = d3.scaleTime()
+    .domain([
+        d3.min(dataset, function(data) { return data.date; }),
+        d3.max(dataset, function(data) { return data.date; })
+    ])
+    .range([
+        padding, svgWidth - padding
+    ]);
+```
+
+Use the amount value to scale the circle's size:
+```js
+var areaScale = d3.scaleSqrt()
+    .domain([0, d3.max(dataset, function(data) { return data.amount; })])
+    .range([0, 10]); // Range is arbitrary - what matters is that the circle areas are relative
+```
+
+Create labels for each circle/data point (see [locale format](https://d3js.org/d3-time-format#locale_format) for formatting options):
+```js
+// Display date/amount value for each circle
+var formatTime = d3.timeFormat("%b %e");
+svg.selectAll("text")
+    .data(dataset)
+    .enter()
+    .append("text")
+    .text(function(data, index) { return formatTime(data.date); })
+    .attr("x", function(data, index) { return xScale(data.date); })
+    .attr("y", function(data, index) {
+        return yScale(data.amount) + 25; // padding
+    })
+    .attr("text-anchor", "middle")
+    .attr("font-size", "14")
+    .attr("fill", "#736272")
+    .attr("font-family", "sans-serif");
+```
+
+<img src="images/scatterplot-amount-labels.png" width="400">
+
+<img src="images/scatterplot-time-labels.png" width="400">
+
+<img src="images/scatterplot-day-label.png" width="400">

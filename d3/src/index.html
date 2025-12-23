@@ -152,7 +152,7 @@
                 .domain([0, d3.max(dataset, function(data) { return data[1]; })])
                 .range([0, 10]); // Range is arbitrary - what matters is that the circle areas are relative
             
-                // For each datapoint, we create a circle
+            // For each datapoint, we create a circle
             svg.selectAll("circle") // Get a reference to all *future* circles that will be created
                 .data(dataset)      // Get the dataset to be applied to each circle
                 .enter()            // Pass in `dataset` to enter()
@@ -191,10 +191,73 @@
                     amount: parseInt(row.Amount)
                 };
             };
-            d3.csv("data/time_scale_data.csv", csvRowConverter)
+            var dataset = await d3.csv("data/time_scale_data.csv", csvRowConverter)
                 .then(function(parsedData) {
                     console.log(parsedData);
+                    return parsedData;
                 });
+            
+            // Plot the time_scale_data in a separate CSV object
+            var svg = d3.select("body")
+                .append("svg")
+                .attr("width", svgWidth)
+                .attr("height", svgHeight)
+                .attr("style", "outline: thin solid #dedede");
+            
+            // Use scaleTime() to map `Date` objects to pixel values
+            // x-values of dates
+            var xScale = d3.scaleTime()
+                .domain([
+                    d3.min(dataset, function(data) { return data.date; }),
+                    d3.max(dataset, function(data) { return data.date; })
+                ])
+                .range([
+                    padding, svgWidth - padding
+                ]);
+            // y-values of amounts
+            var yScale = d3.scaleLinear()
+                .domain([
+                    d3.min(dataset, function(data) { return data.amount; }),
+                    d3.max(dataset, function(data) { return data.amount; })
+                ])
+                .range([
+                    svgHeight - padding, padding
+                ]);
+            // let size of circle depend on amount value
+            var areaScale = d3.scaleSqrt()
+                .domain([0, d3.max(dataset, function(data) { return data.amount; })])
+                .range([0, 10]); // Range is arbitrary - what matters is that the circle areas are relative
+            
+            svg.selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("cx", function(data, index) {
+                    return xScale(data.date);
+                })
+                .attr("cy", function(data, index) {
+                    return yScale(data.amount);
+                })
+                .attr("r", function(data, index) {
+                    return areaScale(data.amount);
+                })
+                .attr("fill", "pink");
+            
+            // Display date/amount value for each circle
+            var formatTime = d3.timeFormat("%A, %b %e");
+            svg.selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .text(function(data, index) { return formatTime(data.date); })
+                .attr("x", function(data, index) { return xScale(data.date); })
+                .attr("y", function(data, index) {
+                    return yScale(data.amount) + 25; // padding
+                })
+                .attr("text-anchor", "middle")
+                .attr("font-size", "14")
+                .attr("fill", "#736272")
+                .attr("font-family", "sans-serif");
         </script>
     </body>
     
