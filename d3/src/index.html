@@ -138,7 +138,7 @@
             
             // Create scales that will ensure that the points always fit in the SVG object
             // We fit the dataset values to the width and height of the SVG
-            var padding = 50;
+            var padding = 100;
             var xScale = d3.scaleLinear()
                 // Across the dataset, compare each value's first element with each other
                 .domain([0, d3.max(dataset, function(data) { return data[0]; })])
@@ -258,6 +258,25 @@
                 .attr("font-size", "14")
                 .attr("fill", "#736272")
                 .attr("font-family", "sans-serif");
+            
+            var xAxis = d3.axisBottom(xScale);
+            // This does not work...
+            //.tickValues([
+            //    xScale(Date(2025, 12, 18)),
+            //    xScale(Date(2025, 12, 19)),
+            //    xScale(Date(2025, 12, 27))
+            //]);
+            svg.append("g") // SVG group
+                .attr("class", "axis")  // Name the SVG group to axis"
+                .attr("transform", "translate(0, " + (svgHeight - padding) + ")")
+                .call(xAxis); // Passes the `g` SVG element to xAxis()
+            
+            // Create a separate SVG group for the y-axis
+            var yAxis = d3.axisLeft(yScale);
+            svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate(" + (padding) + ", 0)")
+                .call(yAxis);
         </script>
     </body>
     

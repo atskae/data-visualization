@@ -780,8 +780,85 @@ svg.selectAll("text")
     .attr("font-family", "sans-serif");
 ```
 
-<img src="images/scatterplot-amount-labels.png" width="400">
+<img src="images/scatterplot-amount-labels.png" width="600">
 
-<img src="images/scatterplot-time-labels.png" width="400">
+<img src="images/scatterplot-time-labels.png" width="600">
 
-<img src="images/scatterplot-day-label.png" width="400">
+<img src="images/scatterplot-day-label.png" width="600">
+
+## Chapter 8: Axes
+
+[D3 axes](https://d3js.org/d3-axis) are *functions* that generate the visual elements of an axis, like ticks, values, labels.
+* D3 axes generates visuals, D3 scales return values.
+* Axes are tied to SVGs, and only work with numerical values (as opposed to categorical).
+
+
+### Setting up an axis
+
+Four axis constructors:
+* `d3.axisTop`
+* `d3.axisBottom`
+* `d3.axisRight`
+* `d3.axisLeft`
+
+In our scatter plot, we can create an axis:
+
+```js
+var xAxis = d3.axisBottom(xScale);
+svg.append("g") // SVG group
+    .attr("class", "axis") // Name the SVG group to axis"
+    .call(xAxis); // Passes the `g` SVG element to xAxis()
+```
+
+The [`g` SVG element](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/g) means group.
+
+<img src="images/axis-dates.png" width="600">
+
+### Positioning Axis
+
+We can apply an [SVG transform](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/transform) to `axisBottom()` to bring the axis to the bottom. Possible transforms: `translate`, `scale`, `rotate`, `skew`.
+
+```js
+svg.append("g") // SVG group
+    .attr("class", "axis")  // Name the SVG group to axis"
+    .attr("transform", "translate(0, " + (svgHeight - padding) + ")")
+    .call(xAxis); // Passes the `g` SVG element to xAxis()
+```
+
+
+<img src="images/axis-bottom.png" width="600">
+
+CSS styles can be applied to the axis using the `.axis` selector and modifying `path`, `line`, and `text`:
+
+[SVG `shape-rendering` property](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/shape-rendering) for crisper edges, optimize for speed, etc.
+
+Note that CSS property names can differ from SVG attribute names (ex. CSS `color` vs. SVG`fill`). See [SVG attributes](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute).
+
+
+### Check for Ticks
+(笑)
+
+We can adjust the number of ticks on the axis (see [docs](https://d3js.org/d3-array/ticks)).
+
+```js
+
+var xAxis = d3.axisBottom(xScale).ticks(5);
+```
+
+<img src="images/axis-5-ticks.png" width="600">
+
+We specified 5 ticks but D3 tries to add the optimal amount of ticks for the axis to be easily readable.
+
+Manual tick values can also be used with `axisBottom().tickValues([])` (but does not work for time scales...).
+
+### Y Not?
+
+```js
+var yAxis = d3.axisLeft(yScale);
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + padding  + ", 0)")
+    .call(yAxis);
+```
+
+<img src="images/y-axis.png" width="600">

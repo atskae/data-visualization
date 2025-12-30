@@ -5,3 +5,12 @@ div.bar {
     background-color: teal;
     margin: 2px;
 }
+
+.axis path,
+.axis line {
+    stroke: white;
+}
+
+.axis text {
+    font-family: serif;
+}
