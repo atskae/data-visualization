@@ -928,3 +928,60 @@ svg.append("g")
 ```
 
 <img src="images/random-scatterplot.png" width="600">
+
+### Formatting Tick Labels
+
+We can use [`axis.tickFormat`](https://d3js.org/d3-axis#axis_tickFormat) if we want cleaner labels on our axes when using decimals/percentages.
+
+We define the formatting we want with `d3.format()`, for example:
+```js
+var formatAsPercentage = d3.format(".1%");
+```
+
+This returns a function, which can format any floating point to a percentage string.
+```js
+> var formatAsPercentage = d3.format(".1%");
+> formatAsPercentage(0.1);
+"10.0%" 
+```
+
+We pass this function to the axis `tickFormat()`:
+```js
+xAxis.tickFormat(formatAsPercentage);
+```
+
+### Time-Based Axes
+
+Add some padding to the xScale/yScale, which adds a bit of padding on the axes:
+```js
+// Create new Date objects, otherwise a reference to the dataset is given
+// (which then we modify the min/max Date values)
+var minDate = new Date(d3.min(dataset, function(data) { return data.date; }));
+minDate.setDate(minDate.getDate() - 1);
+var maxDate = new Date(d3.max(dataset, function(data) { return data.date; }));
+maxDate.setDate(maxDate.getDate() + 1) 
+var xScale = d3.scaleTime()
+    .domain([minDate, maxDate])
+    .range([
+        padding, svgWidth - padding
+    ]);
+// y-values of amounts
+var yScale = d3.scaleLinear()
+    .domain([
+        d3.min(dataset, function(data) { return data.amount; }) - 10,   // padding
+        d3.max(dataset, function(data) { return data.amount; }) + 10    // padding
+    ])
+    .range([
+        svgHeight - padding, padding
+    ]);
+```
+
+Format the x-axis:
+```js
+var timeFormat = d3.timeFormat("%b %d");
+var xAxis = d3.axisBottom(xScale)
+    .tickFormat(timeFormat)
+    .ticks(5);
+```
+
+<img src="images/format-axes.png" width="600">

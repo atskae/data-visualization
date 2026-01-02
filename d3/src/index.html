@@ -206,19 +206,22 @@
             
             // Use scaleTime() to map `Date` objects to pixel values
             // x-values of dates
+            // Create new Date objects, otherwise a reference to the dataset is given
+            // (which then we modify the min/max Date values)
+            var minDate = new Date(d3.min(dataset, function(data) { return data.date; }));
+            minDate.setDate(minDate.getDate() - 1);
+            var maxDate = new Date(d3.max(dataset, function(data) { return data.date; }));
+            maxDate.setDate(maxDate.getDate() + 1) 
             var xScale = d3.scaleTime()
-                .domain([
-                    d3.min(dataset, function(data) { return data.date; }),
-                    d3.max(dataset, function(data) { return data.date; })
-                ])
+                .domain([minDate, maxDate])
                 .range([
                     padding, svgWidth - padding
                 ]);
             // y-values of amounts
             var yScale = d3.scaleLinear()
                 .domain([
-                    d3.min(dataset, function(data) { return data.amount; }),
-                    d3.max(dataset, function(data) { return data.amount; })
+                    d3.min(dataset, function(data) { return data.amount; }) - 10,   // padding
+                    d3.max(dataset, function(data) { return data.amount; }) + 10    // padding
                 ])
                 .range([
                     svgHeight - padding, padding
@@ -244,7 +247,7 @@
                 .attr("fill", "pink");
             
             // Display date/amount value for each circle
-            var formatTime = d3.timeFormat("%A, %b %e");
+            var formatTime = d3.timeFormat("%a, %e");
             svg.selectAll("text")
                 .data(dataset)
                 .enter()
@@ -259,7 +262,10 @@
                 .attr("fill", "#736272")
                 .attr("font-family", "sans-serif");
             
-            var xAxis = d3.axisBottom(xScale);
+            var timeFormat = d3.timeFormat("%b %d");
+            var xAxis = d3.axisBottom(xScale)
+                .tickFormat(timeFormat)
+                .ticks(5);
             // This does not work...
             //.tickValues([
             //    xScale(Date(2025, 12, 18)),
