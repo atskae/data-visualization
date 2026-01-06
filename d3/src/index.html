@@ -341,7 +341,76 @@
                 .attr("class", "axis")
                 .attr("transform", "translate(" + (svgPadding) + ", 15)")
                 .call(yAxis);
-                
+            
+            // Revisit the bar chart
+            var dataset = [
+                20, 13, 22, 21, 44, 15, 39, 9, 25, 18
+            ];
+           
+            var svgWidth = 900;
+            var svgHeight = 400;
+            var svgPadding = 5;
+            var labelPadding = 20;
+            var svg = d3.select("body")
+                .append("svg")
+                .attr("width", svgWidth)
+                .attr("height", svgHeight)
+                .attr("style", "outline: thin solid #dedede");
+
+            // Create an ordinal scale to handle positioning of bars
+            // and their labels
+            var xScale = d3.scaleBand()
+                .domain(d3.range(dataset.length)) // creates an array [0, 1, 2, ..., dataset.length-1]
+                .range([0, svgWidth])
+                .paddingInner(0.05);
+
+            var yScale = d3.scaleLinear()
+                .domain([
+                    d3.min(dataset),
+                    d3.max(dataset)
+                ])
+                .range([
+                    svgHeight - svgPadding, svgPadding
+                ]);
+
+            // Select all the *future* rectangles that will be created
+            svg.selectAll("rect")
+                .data(dataset)  // dataset is passed onto enter()
+                .enter()        // which creates an empty reference to each data value
+                .append("rect") // Creates a rectangle for each data value
+                .attr("x", function(data, index) {
+                    return xScale(index);
+                })   // Apply the following attributes to each rectangle
+                .attr("y", function(data, index) {
+                    return svgHeight - yScale(data);
+                })
+                .attr("width", xScale.bandwidth())
+                .attr("height", function(data, index) {
+                    return yScale(data);
+                })
+                .attr("fill", function(data, index) {
+                    return "rgb(0, 0, " + Math.round(data*10) + ")";
+                });
+
+            // Selects all *future* text that will be created
+            svg.selectAll("text")
+                .data(dataset) // the dataset to be passed into enter()
+                .enter()
+                .append("text") // Creates an empty reference to a text object for this data value
+                .text(function(data, index) { // Not set via attr()
+                    return data;
+                })
+                .attr("x", function(data, index) {
+                    return xScale(index) + xScale.bandwidth()/2;
+                })
+                .attr("y", function(data, index) {
+                    return svgHeight - yScale(data) + labelPadding;
+                })
+                .attr("fill", "white")
+                .attr("font-size", "12px")
+                .attr("font-family", "sans-serif")
+                .attr("text-anchor", "middle"); // set label to be in the middle
+
         </script>
     </body>
     

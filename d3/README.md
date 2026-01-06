@@ -985,3 +985,108 @@ var xAxis = d3.axisBottom(xScale)
 ```
 
 <img src="images/format-axes.png" width="600">
+
+## Chapter 9: Updates, Transitions, and Motion
+
+So far we only used *static datasets*. How to visualize data that changes over time?
+In D3, dataset changes are handled by *updates*, visual adjustments are handled by *transitions*, where *motion* can be added.
+
+### Ordinal Scales, Explained
+[*Ordinal data*](https://d3js.org/d3-scale/ordinal) describe data that can be grouped into categories, with some inherent order to the categories. The domain and range are discrete values. Examples:
+* Exam grades: grade D, grade C, grade B, grade A
+* Freshmen, sophomore, junior, senior
+* Strongly dislike, dislike, neutral, like, strongly like
+
+[`d3.scaleBand()`](https://d3js.org/d3-scale/band) is like an ordinal scale, but while the domain is discrete (categories/buckets), the range is continuous. This scale is useful for bar charts.
+
+Let's revisit the bar chart (re-colored in blue):
+
+```js
+var dataset = [
+    20, 13, 22, 21, 44, 15, 39, 9, 25, 18
+];
+
+```
+<img src="images/bar-chart-revisited.png" width="600">
+
+Let's focus on the x-position of the bars. We can think of each index in the `dataset` array as a category, or the domain of this scale, each category/bar mapping to a pixel value in the SVG:
+
+```js
+// Create an ordinal scale to handle positioning of bars
+// and their labels
+var xScale = d3.scaleBand()
+    .domain(d3.range(dataset.length)) // creates an array [0, 1, 2, ..., dataset.length-1]
+    .rangeRound([0, svgWidth])
+    .paddingInner(0.05);
+```
+
+### Starting Your Own Band
+This line: 
+```js
+.rangeRound([0, svgWidth])
+```
+
+essentially maps each domain value `[0, 1, 2, ..., dataset.length-1]` to a band of equal length (`svgWidth/dataset.length`).
+
+`rangeRound()` will round the band value to a whole number (as opposed to `range()`). This is useful if we do not want to map to fractional pixel values, which would lead to visually fuzzy bars.
+
+### Referencing the band scale
+
+We can compute the x-position of the bars with `xScale(i)` (`i` being the index of the data value in `dataset`) and the width of the bar with `xScale.bandwidth()` (the padding is already calculated by `xScale`):
+```js
+svg.selectAll("rect")
+    .data(dataset)  // dataset is passed onto enter()
+    .enter()        // which creates an empty reference to each data value
+    .append("rect") // Creates a rectangle for each data value
+    .attr("x", function(data, index) {
+        return xScale(index)
+    })
+    .attr("width", xScale.bandwidth())
+```
+
+<img src="images/bar-chart-with-scale-band.png" width="600">
+
+Scaling the y values:
+```js
+svg.selectAll("rect")
+    .data(dataset)  // dataset is passed onto enter()
+    .enter()        // which creates an empty reference to each data value
+    .append("rect") // Creates a rectangle for each data value
+    .attr("x", function(data, index) {
+        return xScale(index);
+    })   // Apply the following attributes to each rectangle
+    .attr("y", function(data, index) {
+        return svgHeight - yScale(data);
+    })
+    .attr("width", xScale.bandwidth())
+    .attr("height", function(data, index) {
+        return yScale(data);
+    })
+```
+
+Use the scales the set the labels:
+```js
+// Selects all *future* text that will be created
+svg.selectAll("text")
+    .data(dataset) // the dataset to be passed into enter()
+    .enter()
+    .append("text") // Creates an empty reference to a text object for this data value
+    .text(function(data, index) { // Not set via attr()
+        return data;
+    })
+    .attr("x", function(data, index) {
+        return xScale(index) + xScale.bandwidth()/2;
+    })
+    .attr("y", function(data, index) {
+        return svgHeight - yScale(data) + labelPadding;
+    })
+    .attr("fill", "white")
+    .attr("font-size", "12px")
+    .attr("font-family", "sans-serif")
+    .attr("text-anchor", "middle"); // set label to be in the middle
+```
+
+There is a bug... (bars are height-reversed), will fix...
+
+<img src="images/bar-chart-y-scale-buggy.png" width="600">
+
