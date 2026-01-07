@@ -1090,3 +1090,16 @@ There is a bug... (bars are height-reversed), will fix...
 
 <img src="images/bar-chart-y-scale-buggy.png" width="600">
 
+Oops, `yScale` should compute the height of the bar:
+```js
+var yScale = d3.scaleLinear()
+    .domain([
+        d3.min(dataset),
+        d3.max(dataset)
+    ])
+    .range([
+        svgPadding, svgHeight - svgPadding  // <--- fixed here
+    ]);
+```
+
+<img src="images/bar-chart-y-scale-buggy-fixed.png" width="600">

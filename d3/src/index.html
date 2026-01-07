@@ -350,7 +350,7 @@
             var svgWidth = 900;
             var svgHeight = 400;
             var svgPadding = 5;
-            var labelPadding = 20;
+            var labelPadding = 30;
             var svg = d3.select("body")
                 .append("svg")
                 .attr("width", svgWidth)
@@ -370,7 +370,7 @@
                     d3.max(dataset)
                 ])
                 .range([
-                    svgHeight - svgPadding, svgPadding
+                    svgPadding, svgHeight - svgPadding 
                 ]);
 
             // Select all the *future* rectangles that will be created
