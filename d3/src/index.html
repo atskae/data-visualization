@@ -12,6 +12,9 @@
         <div class="bar"></div> 
 
         <h1>Learning D3</h1>
+        <button type="button">Click to update bar chart</button>
+        <div class="empty"></div>
+        
         <script type="module">
             import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
             console.log("Imported D3");
@@ -410,6 +413,33 @@
                 .attr("font-size", "12px")
                 .attr("font-family", "sans-serif")
                 .attr("text-anchor", "middle"); // set label to be in the middle
+
+            // Create an event handler for re-loading new data into the bar chart
+            var button = d3.select("body").append("button").text("Click!").attr("type", "button");
+            button.on("click", function() {
+                console.log("The button was clicked!");
+                var dataset = [
+                    18, 22, 20, 11, 22, 25, 39, 44, 15, 39
+                ];
+                svg.selectAll("rect")
+                    .data(dataset) // Bind the new dataset
+                    .attr("y", function(d, i) {
+                        return svgHeight - yScale(d);
+                    })
+                    .attr("height", function(d, i) {
+                        return yScale(d);
+                    });
+                
+                // Update the labels
+                svg.selectAll("text")
+                    .data(dataset) // the dataset to be passed into enter()
+                    .text(function(data, index) { // Not set via attr()
+                        return data;
+                    })
+                    .attr("y", function(data, index) {
+                        return svgHeight - yScale(data) + labelPadding;
+                    });
+            })
 
         </script>
     </body>

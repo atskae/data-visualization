@@ -2,7 +2,7 @@
 
 Keeping track of learning D3 here.
 
-Using [Interactive Data Visualization for the Web](https://scottmurray.org/work/d3-book-2e) by Scott Murray to start!
+Using [Interactive Data Visualization for the Web](https://scottmurray.org/work/d3-book-2e) (with [code examples here](https://github.com/scotthmurray/d3-book/tree/master)) by Scott Murray to start!
 * Note that I am using D3 v7 while the book refers to v4
 
 # How to Run
@@ -1103,3 +1103,51 @@ var yScale = d3.scaleLinear()
 ```
 
 <img src="images/bar-chart-y-scale-buggy-fixed.png" width="600">
+
+### Updating Data
+
+#### Interaction via Event Listeners
+
+We can create a button in HTML:
+```html
+<button type="button">Click to update bar chart</button>
+```
+
+and apply an event listener to it:
+```js
+d3.select("button").on("click", function() {
+    console.log("The button was clicked!");
+})
+```
+
+<img src="images/html-button.png" width="200">
+
+When clicked, we see the log in the JS console:
+
+```
+The button was clicked!
+```
+
+#### Changing the Data
+We can also dynamically create a button and attach an event handler to it:
+```js
+// Create an event handler for re-loading new data into the bar chart
+var button = d3.select("body").append("button").text("Click!").attr("type", "button");
+button.on("click", function() {
+    console.log("The button was clicked!");
+    var dataset = [
+        40, 18, 17, 10, 57, 19, 27, 28, 36, 11
+    ];
+    svg.selectAll("rect")
+        .data(dataset) // Bind the new dataset
+        .attr("y", function(d, i) {
+            return svgHeight - yScale(d);
+        })
+        .attr("height", function(d, i) {
+            return yScale(d);
+        });
+})
+```
+
+<img src="images/button-change-dataset-0.png" width="400">
+<img src="images/button-change-dataset-1.png" width="400">
