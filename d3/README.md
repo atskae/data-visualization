@@ -1151,3 +1151,132 @@ button.on("click", function() {
 
 <img src="images/button-change-dataset-0.png" width="400">
 <img src="images/button-change-dataset-1.png" width="400">
+
+
+### Transitions
+We can add animated transitions by calling `transition()` after the selection is made and data is binded, but before other visual changes are made:
+```js
+svg.selectAll("rect")
+    .data(dataset)
+    .transition() // <--- Added here!
+    .attr("y", function(d, i) {
+        return svgHeight - yScale(d);
+    })
+    .attr("height", function(d, i) {
+        return yScale(d);
+    });
+```
+
+D3 will interpolate the current state and the next desired state and apply those changes over time.
+
+#### `duration()` or How Long Is This Going to Take?
+We can add `duration()` after the `transition()` call to configure how long the whole transition animation lasts. The `duration()` call takes in a value in miliseconds, and the default is 250ms.
+
+```js
+svg.selectAll("rect")
+    .data(dataset)
+    .transition()
+    .duration(2000) // <--- Added here! in miliseconds
+    .attr("y", function(d, i) {
+        return svgHeight - yScale(d);
+    })
+    .attr("height", function(d, i) {
+        return yScale(d);
+    });
+```
+
+The labels are not animated with the bars - all we have to do is add the transition and the same duration time as the bars:
+```js
+// Update the labels
+svg.selectAll("text")
+    .data(dataset)
+    .transition()
+    .duration(2000)
+    .text(function(data, index) {
+        return data;
+    })
+    .attr("y", function(data, index) {
+        return svgHeight - yScale(data) + labelPadding;
+    });
+```
+
+Transitions can only happen on values that already exist. For example, if `opacity` was never set, it will not animate - you need to set a opacity value first before applying `transition()`.
+
+#### `ease()`-y Does It
+We can also configure how fast and slow the transition is at the beginning/middle/end, or how an object "eases" into place.
+For example, by default, the animation is set to `easeCubicInOut`, which means the animation is slow at the beginning, speeds up in the middle, then slows back down toward the end.
+
+Apply `ease()` after `transition()`. Let's compare `easeCubicInOut` (default), to `easeLinear`, which gradually accelerates the animation (no deceleration):
+
+```js
+svg.selectAll("rect")
+    .data(dataset)
+    .transition()
+    .duration(2000)
+    .ease(d3.easeLinear) // <--- Added here!
+    .attr("y", function(d, i) {
+        return svgHeight - yScale(d);
+    })
+    .attr("height", function(d, i) {
+        return yScale(d);
+    });
+```
+
+See d3's docs on [all the types of eases](https://d3js.org/d3-ease), some examples:
+* `easeElasticOut` - gives a springy feel
+* `easeBounceOut` - the object bounces into place
+
+#### Please Do Not `delay()`
+Configure when the animation starts by calling `delay()`.
+A use case is to stagger delays of different objects (we can calculate the delay dynamically). For example, we can delay each bar in our bar graph:
+```js
+svg.selectAll("rect")
+    .data(dataset)
+    .transition()
+    .delay(function(data, index) { // Add anonymous function to calculate delay based on the bar's index
+        return index * 100; // miliseconds
+    })
+    .duration(500) // <-- adjusted 
+    .ease(d3.easeCubicInOut)
+    .attr("y", function(d, i) {
+        return svgHeight - yScale(d);
+    })
+    .attr("height", function(d, i) {
+        return yScale(d);
+    });
+```
+
+With the current configuration of `delay()`, the more data we have, the longer the whole animation takes. To make sure the animation time is the same, regardless of how many data points we have, we can compute delay differently:
+```js
+    .delay(function(data, index) { // Add anonymous function to calculate delay based on the bar's index
+        return (index / dataset.length) * 1000; // miliseconds
+    })
+```
+
+We get a normalized value from `(index / dataset.length)` (a value between 0 and 1), then multiply that by the total time we'd like for all the bars to finish animating (1000 miliseconds).
+
+So regardless of dataset size, the animation overall will take 1000ms, making our code *scalable*.
+
+#### Randomizing the Data
+
+We can update our button event handler to generate a new random dataset:
+```js
+var numDataValues = dataset.length; // original dataset's length
+var dataMin = 10;
+var dataMax = 40;
+button.on("click", function() {
+    console.log("The button was clicked!");
+    var dataset = [];
+    for (var i=0; i<numDataValues; i++) {
+        dataset.push(Math.floor(Math.random() * dataMax - dataMin + 1) + dataMin)
+    }
+    // ...
+})
+```
+TODO: update label y position to put the label above the bar and in black if the height of the bar does not fit the label.
+
+#### Updating Scales
+In our event handler, we also have to update the yScale to adjust to new datasets:
+```js
+yScale.domain([0, d3.max(dataset)]);
+```

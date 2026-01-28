@@ -416,13 +416,30 @@
 
             // Create an event handler for re-loading new data into the bar chart
             var button = d3.select("body").append("button").text("Click!").attr("type", "button");
+            var numDataValues = dataset.length;
+            var dataMin = 0;
+            var dataMax = 100;
             button.on("click", function() {
                 console.log("The button was clicked!");
-                var dataset = [
-                    18, 22, 20, 11, 22, 25, 39, 44, 15, 39
-                ];
+                var dataset = [];
+                for (var i=0; i<numDataValues; i++) {
+                    dataset.push(Math.floor(Math.random() * dataMax - dataMin + 1) + dataMin)
+                } 
+                console.log(
+                    "New dataset: ", dataset
+                ) 
+                
+                // Update the scale to adjust to the new dataset
+                yScale.domain([0, d3.max(dataset)]);
+                
                 svg.selectAll("rect")
                     .data(dataset) // Bind the new dataset
+                    .transition()
+                    .delay(function(data, index) {
+                        return (index / dataset.length) * 1000; // miliseconds
+                    })
+                    .duration(1000) // duration of each bar
+                    .ease(d3.easeLinear)
                     .attr("y", function(d, i) {
                         return svgHeight - yScale(d);
                     })
@@ -433,6 +450,12 @@
                 // Update the labels
                 svg.selectAll("text")
                     .data(dataset) // the dataset to be passed into enter()
+                    .transition()
+                    .delay(function(data, index) {
+                        return (index / dataset.length) * 1000; // miliseconds
+                    })
+                    .duration(1000)
+                    .ease(d3.easeLinear)
                     .text(function(data, index) { // Not set via attr()
                         return data;
                     })
