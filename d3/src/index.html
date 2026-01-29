@@ -460,7 +460,21 @@
                         return data;
                     })
                     .attr("y", function(data, index) {
-                        return svgHeight - yScale(data) + labelPadding;
+                        var barHeight = yScale(data);
+                        //console.log("Bar height for " + data + " is " + barHeight);
+                        if (barHeight < 50) {
+                            return svgHeight - barHeight - 10;
+                        } else {
+                            return svgHeight - barHeight + labelPadding;
+                        }
+                    })
+                    .attr("fill", function(data, index) {
+                        var barHeight = yScale(data);
+                        if (barHeight < 50) {
+                            return "black";
+                        } else {
+                            return "white";
+                        }
                     });
             })
 

@@ -1273,7 +1273,40 @@ button.on("click", function() {
     // ...
 })
 ```
-TODO: update label y position to put the label above the bar and in black if the height of the bar does not fit the label.
+
+We can update the label position based on bar height. If the bar is too short, we put the label above the bar and make the text color black. Otherwise, put the label in the bar and make the text white:
+```js
+// Update the labels
+selectAll("text")
+    .data(dataset)
+    .transition()
+    .delay(function(data, index) {
+        return (index / dataset.length) * 1000;
+    })
+    .duration(1000)
+    .ease(d3.easeLinear)
+    .text(function(data, index) {
+        return data;
+    })
+    .attr("y", function(data, index) { // <--- adjust label based on bar height
+        var barHeight = yScale(data);
+        if (barHeight < 50) {
+            return svgHeight - barHeight - 10;
+        } else {
+            return svgHeight - barHeight + labelPadding;
+        }
+    })
+    .attr("fill", function(data, index) { // <--- interestingly the text color change also animates/transitions nicely
+        var barHeight = yScale(data);
+        if (barHeight < 50) {
+            return "black";
+        } else {
+            return "white";
+        }
+    });
+```
+
+<img src="images/adjust_label_bar_height.png" width="400">
 
 #### Updating Scales
 In our event handler, we also have to update the yScale to adjust to new datasets:
