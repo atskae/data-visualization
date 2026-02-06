@@ -1313,3 +1313,34 @@ In our event handler, we also have to update the yScale to adjust to new dataset
 ```js
 yScale.domain([0, d3.max(dataset)]);
 ```
+
+#### Updating Axes
+We first update the class names for the x and y axes to be able to reference them later:
+```js
+var xAxis = d3.axisBottom(xScale);
+    svg.append("g")
+        .attr("class", "x axis")  // <--- Update class name
+        .attr("transform", "translate(0, " + (svgHeight - svgPadding + 15) + ")")
+        .call(xAxis); // Passes the `g` SVG element to xAxis()
+
+var yAxis = d3.axisLeft(yScale);
+    svg.append("g")
+        .attr("class", "y axis") // <--- Update class name
+        .attr("transform", "translate(" + (svgPadding) + ", 15)")
+        .call(yAxis);
+```
+
+Then reference the axes in the button's click function:
+```js
+// Update the axes
+svg.select(".x.axis")
+    .transition()
+    .duration(1000)
+    .call(xAxis);
+svg.select(".y.axis")
+    .transition()
+    .duration(1000)
+    .call(yAxis);
+```
+
+The axes now adjust when new data is loaded!
