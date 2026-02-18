@@ -1398,7 +1398,7 @@ If we added a new transition inside of `on("start")`:
 
 The positions of the circles do not change anymore, but the color and radius changes from the inner transition: 
 
-<img src="images/on_start_inner_transition.png" width="400">
+<img src="images/on_start_inner_transition.png" width="600">
 
 This is because only one `transition()` can be active at a time. Subsequent transitions will overwrite earlier transitions. So if we review the overall call:
 
@@ -1445,7 +1445,7 @@ This turns the circles to orange and increases the radius after the main transit
 
 Ahaha:
 
-<img src="images/on_end_inner_transition.png" width="400">
+<img src="images/on_end_inner_transition.png" width="600">
 
 A cleaner way to chain multiple transitions is to add multple `transition()` calls after the main transition:
 ```js
@@ -1476,3 +1476,58 @@ svg.selectAll("circle")
 This does the same animation as above.
 
 It's best to chain transitions as the above, and use `on()` for immediate, non-transition changes at the start or end of a transition.
+
+##### Containing visual elements with clipping paths
+
+Sometimes visual elements cover the axes in a graph (for example, the circles in the scatterplot above).
+
+We can use SVG **clipping paths**, which are like *masks* in drawing software like Photoshop/Illustrator.
+
+A *clipping path* (or mask) is an SVG element, which is applied to other SVG elements. If an element falls under the clipping path, then that element becomes visible, otherwise the element is hidden.
+
+A clipping path has no visual presence, but can be defined by a shape:
+```svg
+<clipPath id="chart-area">
+    <rect x="30" y="30" width="410" height="240"> </rect>
+</clipPath>
+```
+
+To use a clipping path:
+1. Define the clipping path and give it an ID to reference to it later
+    ```js
+    // The original SVG element for the scatterplot
+    var svg = d3.select("body")
+        .append("svg")
+        .attr("width", svgWidth)
+        .attr("height", svgHeight)
+        .attr("style", "outline: thin solid #dedede");
+    
+    // Add a clipping path for the circles in the scatterplot
+    // This prevents circles from covering the axes
+    svg.append("clipPath")
+        .attr("id", "chart-area")
+        .append("rect")
+        .attr("x", svgPadding)
+        .attr("y", svgPadding)
+        .attr("width", svgWidth - svgPadding)
+        .attr("height", svgHeight - svgPadding);
+    ```
+1. Define the clipping path's shape (ex. define a `<rect>` inside the `<clipPath>`)
+    Above we added a `"rect"` to define the clipping path's shape.
+    
+1. Reference the clipping path by the elements that you'd like to be masked by the clipping path
+    
+    Every circle needs a reference to the clipping path. To make that easier, we can add all the circles into a group `g`, then have the group reference the clipping path:
+    ```js
+    svg.append("g") // Create a group that holds all the scatterplot circles
+        .attr("id", "circles")
+        .attr("clip-path", "url(#chart-area)") // Reference the clipping path
+        .selectAll("circle")
+        .data(dataset)
+        .enter()
+        .append("circle")
+    ```
+
+TODO: It's buggy and the clipping mask shows up as a 0x0 SVG... fix...
+
+<img src="images/clipping_path_bug.png" width="1000">

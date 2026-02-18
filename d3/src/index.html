@@ -493,6 +493,17 @@
                 .attr("width", svgWidth)
                 .attr("height", svgHeight)
                 .attr("style", "outline: thin solid #dedede");
+            
+            // Add a clipping path for the circles in the scatterplot
+            // This prevents circles from covering the axes
+            svg.append("clipPath")
+                .attr("id", "chart-area")
+                .append("rect")
+                .attr("x", svgPadding)
+                .attr("y", svgPadding)
+                .attr("width", svgWidth - svgPadding)
+                .attr("height", svgHeight - svgPadding);
+
             for (var i=0; i<numPoints; i++) {
                 var x = Math.floor(Math.random() * xMax - xMin + 1) + xMin;
                 var y = Math.floor(Math.random() * yMax - yMin + 1) + yMin;
@@ -525,7 +536,11 @@
                 .call(yAxis);
 
             // Create scales for x and y values
-            svg.selectAll("circle")
+            
+            svg.append("g") // Create a group that holds all the scatterplot circles
+                .attr("id", "circles")
+                .attr("clip-path", "url(#chart-area)") // Reference the clipping path
+                .selectAll("circle")
                 .data(dataset)
                 .enter()
                 .append("circle")
