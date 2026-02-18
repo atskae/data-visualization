@@ -1384,3 +1384,95 @@ We can select the current element with `d3.select(this)`:
 ```
 
 ##### Warning: Start carefully
+
+If we added a new transition inside of `on("start")`:
+```js
+.on("start", function() {
+    d3.select(this)
+        .transition() // New transition
+        .duration(250) // New duration
+        .attr("fill", "blue")
+        .attr("r", 10)
+})
+```
+
+The positions of the circles do not change anymore, but the color and radius changes from the inner transition: 
+
+<img src="images/on_start_inner_transition.png" width="400">
+
+This is because only one `transition()` can be active at a time. Subsequent transitions will overwrite earlier transitions. So if we review the overall call:
+
+```js
+svg.selectAll("circle")
+    .data(dataset)
+    .transition() // This transition is overwritten by the inner `start` transition()
+    .on("start", function() {
+        d3.select(this)
+            .transition() // Overwrites earlier transition()
+            .duration(250)
+            .attr("fill", "blue")
+            .attr("r", 10)
+    })
+    .attr("cx", function(data, index) {
+        return xScale(data[0]);
+    })
+    .attr("cy", function(data, index) {
+        return yScale(data[1]);
+    })
+    .attr("r", 3)
+    .attr("fill", "#c46021")
+    .on("end", function() {
+        d3.select(this)
+            .attr("fill", "orange")
+            .attr("r", 5)
+    });
+```
+
+##### End gracefully
+
+However, we can add a new transition in `on("end")` because at this point, the primary transition has ended already.
+
+This turns the circles to orange and increases the radius after the main transition:
+```js
+.on("end", function() {
+    d3.select(this)
+        .transition() // Added new transition
+        .duration(1000) // Added new duration
+        .attr("fill", "orange")
+        .attr("r", 20) // Obnoxiously large radius
+});
+```
+
+Ahaha:
+
+<img src="images/on_end_inner_transition.png" width="400">
+
+A cleaner way to chain multiple transitions is to add multple `transition()` calls after the main transition:
+```js
+svg.selectAll("circle")
+    .data(dataset)
+    .transition() // Transition #1
+    .on("start", function() {
+        d3.select(this)
+            //.transition()
+            //.duration(250)
+            .attr("fill", "blue")
+            .attr("r", 10)
+    })
+    .attr("cx", function(data, index) {
+        return xScale(data[0]);
+    })
+    .attr("cy", function(data, index) {
+        return yScale(data[1]);
+    })
+    .attr("r", 3)
+    .attr("fill", "#c46021")
+    .transition() // Transition #2 (removed on(`end`))
+    .duration(1000)
+    .attr("fill", "orange")
+    .attr("r", 20);
+```
+
+This does the same animation as above.
+
+It's best to chain transitions as the above, and use `on()` for immediate, non-transition changes at the start or end of a transition.
