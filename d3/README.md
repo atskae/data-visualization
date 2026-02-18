@@ -1344,3 +1344,43 @@ svg.select(".y.axis")
 ```
 
 The axes now adjust when new data is loaded!
+
+#### `on()` Transition Starts and Ends
+
+We can add animations that occur at the start or end of a transition using `on()` using `"start"` and `"stop"` parameters:
+```js
+svg.selectAll("circle")
+    .data(datase)
+    .transition()
+    .on("start", function() { // At the start of the transition
+        d3.select(this)
+            .attr("fill", "blue")
+            .attr("r", 10)
+    })
+    .attr("cx", function(data, index) {
+        return xScale(data[0]);
+    })
+    .attr("cy", function(data, index) {
+        return yScale(data[1]);
+    })
+    .attr("r", 3)
+    .attr("fill", "#c46021")
+    .on("end", function() { // At the end of the transition
+        d3.select(this)
+            .attr("fill", "orange")
+            .attr("r", 5)
+    });;
+```
+
+👆 an incredibly annoying scatterplot to view 笑
+
+We can select the current element with `d3.select(this)`:
+```js
+.on("start", function() {
+    d3.select(this) // Select the current element, which are the circles
+        .attr("fill", "blue")
+        .attr("r", 10)
+})
+```
+
+##### Warning: Start carefully

@@ -564,6 +564,11 @@
                 svg.selectAll("circle")
                     .data(dataset)
                     .transition()
+                    .on("start", function() {
+                        d3.select(this)
+                            .attr("fill", "blue")
+                            .attr("r", 10)
+                    })
                     .attr("cx", function(data, index) {
                         return xScale(data[0]);
                     })
@@ -571,7 +576,12 @@
                         return yScale(data[1]);
                     })
                     .attr("r", 3)
-                    .attr("fill", "#c46021");
+                    .attr("fill", "#c46021")
+                    .on("end", function() {
+                        d3.select(this)
+                            .attr("fill", "orange")
+                            .attr("r", 5)
+                    });
                 
                 // Update the axes
                 svg.select(".x.axis")
