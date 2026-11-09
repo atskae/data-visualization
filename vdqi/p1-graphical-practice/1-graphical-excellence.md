@@ -31,6 +31,30 @@ The data graphic can only be as good as its dataset
 * Need to be careful with data maps:
     * The viewer assumes geographic size is related to population/importance
     * Our attention goes straight to exploring the data on the map, and not *how* the data was collected
-        * Ex) How was the cause of death determined? Differences in how cancers are diagnosed in different geographic area
+        * Ex) How was the cause of death determined? Differences in how cancers are diagnosed in different geographic area or doctor
 
 Data maps, the combination of statistics and cartography, first appeared in the 17th century, 5,000 years after the first maps were drawn on clay tablets
+* Yü Chi Thu map, 11th century AD in China
+    <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Yu_Chi_Thu.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" width="500px" />
+    * Precision of river networks and coast was very advanced for its time
+    * Nothing like this existed in Europe until the 1500s
+
+* 1546 edition of *Cosmographia* by Petrus Apianus showed various European cities relative to each other in distance
+    * (not the map but the artwork is really pretty)
+    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Petrus_Apianus%2C_Cosmographia%2C_1545.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" width="350px">
+
+* 1786 - first economic time series plotted
+* 1686 - Edmond Halley's map on trade winds and monsoons on a world map:
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Edmond_Halley%27s_map_of_the_trade_winds%2C_1686.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" width="800px">
+    * One of the earliest data maps
+    * 💡 Quantum circuits + wind maps?
+* 1854 - Dr. John's Snow's dot map of cholera deaths in Central London
+    <img src="https://www.york.ac.uk/depts/maths/histstat/images/snow_map.gif" width="500px" style="background-color: white;">
+    * Water pumps are marked as an `x`, and observed that most deaths occurred near the Broad Street water pump
+        * This waterpump was removed, ending the epidemic that killed 500+ people
+* 1864 - Charles Joseph Minard applied quantity and direction in this wine export map:
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Minard%E2%80%99s_map_of_French_wine_exports_for_1864.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" width="700px">
+    * ❓ Does thickness correlated with how much wine was exported to that destination?
+
+Computers allow an enormous density of information compared to Halley's wind map from 1686
+* [Mapping the galaxies of the universe](https://ui.adsabs.harvard.edu/abs/1977AJ.....82..249S/abstract)
